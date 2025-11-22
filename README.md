@@ -4,6 +4,9 @@
 
 Agento MCP brings the power of Model Context Protocol (MCP) to Magento 2, enabling seamless AI integration with Cursor IDE, Claude, and other AI assistants. Execute SQL queries, manage cache, and access 100+ magerun commands - all through natural language in your IDE.
 
+<img width="1081" height="462" alt="image" src="https://github.com/user-attachments/assets/dcfc4743-4bd1-414e-b492-1143ca6a1495" />
+
+
 ## Why Agento MCP?
 
 - ⚡ **Faster Development**: No more context switching between terminal and IDE
