@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/pestphp/pest/phpunit.xsd"
+         bootstrap="Pest.php"
+         colors="true"
+         cacheDirectory=".pest.cache"
+         executionOrder="random"
+         stopOnFailure="false">
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>Feature</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
+

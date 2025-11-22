@@ -1,0 +1,24 @@
+{
+    "name": "agento/core-tests",
+    "description": "Standalone tests for Agento Core",
+    "type": "library",
+    "require": {
+        "php": ">=7.4",
+        "pestphp/pest": "^3.8",
+        "symfony/process": "^5.0|^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tests\\": ""
+        },
+        "files": [
+            "Helpers.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

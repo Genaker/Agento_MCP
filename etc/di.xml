@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="agentoQueryCommand" xsi:type="object">Agento\Core\Console\Command\QueryCommand</item>
+                <item name="agentoCacheClearCommand" xsi:type="object">Agento\Core\Console\Command\CacheClearCommand</item>
+                <item name="agentoMcpCommand" xsi:type="object">Agento\Core\Console\Command\McpCommand</item>
+                <item name="agentoMcpListCommand" xsi:type="object">Agento\Core\Console\Command\McpListCommand</item>
+                <item name="agentoMagerunInstallCommand" xsi:type="object">Agento\Core\Console\Command\MagerunInstallCommand</item>
+                <item name="agentoCursorInstallCommand" xsi:type="object">Agento\Core\Console\Command\CursorInstallCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
+
