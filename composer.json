@@ -1,17 +1,26 @@
 {
-    "name": "agento/core",
+    "name": "genaker/agento-mcp",
     "description": "AI-powered development tools for Magento - MCP server integration, SQL queries, cache management, and n98-magerun2 integration",
     "type": "magento2-module",
-    "version": "1.0.0",
     "license": "MIT",
+    "keywords": [
+        "magento2",
+        "mcp",
+        "model-context-protocol",
+        "ai",
+        "cursor",
+        "magerun",
+        "development-tools"
+    ],
     "authors": [
         {
-            "name": "Agento",
-            "email": "dev@agento.com"
+            "name": "Genaker",
+            "homepage": "https://github.com/Genaker"
         }
     ],
     "require": {
         "php": ">=8.1",
+        "magento/framework": "^103.0|^104.0",
         "php-mcp/server": "^2.0"
     },
     "autoload": {

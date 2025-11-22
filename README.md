@@ -1,19 +1,43 @@
-# Agento - AI-Powered Development Tools for Magento
+# Agento MCP - AI-Powered Development Tools for Magento 2
 
-Agento is an AI-powered development tool for Magento, similar to Laravel Boost. It provides SQL query execution, cache management, and MCP server integration for AI-assisted development.
+**Transform your Magento development workflow with AI-powered tools!** 🚀
+
+Agento MCP brings the power of Model Context Protocol (MCP) to Magento 2, enabling seamless AI integration with Cursor IDE, Claude, and other AI assistants. Execute SQL queries, manage cache, and access 100+ magerun commands - all through natural language in your IDE.
+
+## Why Agento MCP?
+
+- ⚡ **Faster Development**: No more context switching between terminal and IDE
+- 🤖 **AI-Powered**: Natural language commands for Magento operations
+- 🔧 **Comprehensive**: Access to SQL, cache, magerun, and more
+- 🎯 **Developer-Friendly**: Built for Magento developers by Magento developers
+- 📦 **Easy Installation**: Works with any Magento 2.4+ installation
+- ✅ **Zero Configuration**: Works out of the box after installation
 
 ## Features
 
-- **SQL Query Execution**: Run SQL queries directly from the command line
-- **Cache Management**: Clear Magento cache with ease
-- **MCP Server**: Model Context Protocol server for AI integration with Cursor and other AI tools
-- **n98-magerun2 Integration**: Access to 100+ magerun commands for comprehensive Magento management
+- **MCP Server Integration**: Full Model Context Protocol support for Cursor IDE and other AI tools
+- **SQL Query Execution**: Run SQL queries directly through AI chat or command line
+- **Cache Management**: Clear Magento cache with simple natural language commands
+- **n98-magerun2 Integration**: Access to 100+ magerun commands via AI
+- **Redis Support**: Flush Redis cache directly through MCP tools
+- **Multiple Output Formats**: JSON, CSV, and table formats for query results
+- **Natural Language Interface**: Query admin users, orders, products, and more using plain English
 
 ## Installation
 
-### Step 1: Enable the Module
+### Option 1: Install via Composer (Recommended)
 
-The module should already be enabled. If not, run:
+```bash
+composer require genaker/agento-mcp
+php bin/magento module:enable Agento_Core
+php bin/magento setup:upgrade
+php bin/magento cache:clean
+```
+
+### Option 2: Manual Installation
+
+1. Clone or download this repository to `app/code/Agento/Core`
+2. Enable the module:
 
 ```bash
 php bin/magento module:enable Agento_Core
@@ -21,7 +45,7 @@ php bin/magento setup:upgrade
 php bin/magento cache:clean
 ```
 
-### Step 2: Install n98-magerun2 (Optional but Recommended)
+### Step 3: Install n98-magerun2 (Optional but Recommended)
 
 Agento integrates with n98-magerun2 for additional Magento CLI tools. To install:
 
@@ -38,7 +62,7 @@ php bin/n98-magerun2.phar --version
 
 For more information, visit: https://github.com/netz98/n98-magerun2
 
-### Step 3: Verify Installation
+### Step 4: Verify Installation
 
 Check that the commands are available:
 
@@ -402,11 +426,42 @@ php app/code/Agento/Core/tests/run-standalone-tests.php
 
 See `tests/README.md` for more details.
 
+## Perfect For
+
+- **Magento developers** using Cursor IDE or other AI coding assistants
+- **Development teams** wanting to streamline workflows
+- **Developers** exploring AI-assisted coding
+- **Anyone managing Magento stores** who wants faster access to data and operations
+
+## Real-World Examples
+
+Once set up, you can use natural language commands in Cursor:
+
+- "Show me all active admin users"
+- "What's the last order?"
+- "Clear the config cache"
+- "How many customers do we have?"
+- "List all Magento stores"
+- "Get the customer with the most orders"
+
+The AI will automatically use the appropriate MCP tools to execute these requests!
+
 ## Support
 
 For issues or questions, please check:
-- Magento documentation
-- Cursor MCP documentation
+- [GitHub Repository](https://github.com/Genaker/Agento_MCP)
+- [Magento documentation](https://devdocs.magento.com/)
+- [Cursor MCP documentation](https://docs.cursor.com/)
 - Module code in `app/code/Agento/Core/`
 - Test suite in `app/code/Agento/Core/tests/`
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT License - See LICENSE file for details
+
+Built with ❤️ for the Magento community.
 
