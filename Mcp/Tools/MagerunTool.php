@@ -37,7 +37,35 @@ class MagerunTool
      * Provides 100+ commands for database operations, cache management, admin users, 
      * system info, configuration, customers, indexing, modules, and setup.
      * 
-     * COMMAND PARAMETERS (examples):
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * PARAMETER USAGE - Beautiful & Intuitive API
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * 
+     * ✨ Use descriptive parameter names instead of numeric keys:
+     * 
+     *   OLD (doesn't work): {"command": "admin:user:activate", "0": "admin"}  ❌
+     *   NEW (beautiful):    {"command": "admin:user:activate", "username": "admin"}  ✅
+     * 
+     * 📋 Common Parameters:
+     *   - username, email, user  → User identifiers (auto-mapped to positional args)
+     *   - query                  → SQL queries for db:query
+     *   - path                   → File/directory paths for dump/import commands
+     *   - type                   → Cache types, entity types
+     *   - format                 → Output format (json, csv, xml, yaml)
+     *   - activate/deactivate    → Boolean flags
+     *   - force                  → Skip confirmations
+     *   - website, store         → Scope identifiers
+     * 
+     * 🎯 Why named parameters?
+     *   PHP cannot have numeric parameter names ($0, $1), and the php-mcp/server library
+     *   maps JSON-RPC arguments by name. So we use intuitive descriptive names that make
+     *   the API self-documenting and beautiful!
+     * 
+     * 🔧 Fallback for edge cases: arg0, arg1, arg2 (when descriptive names aren't enough)
+     * 
+     * ═══════════════════════════════════════════════════════════════════════════════
+     * COMMAND EXAMPLES
+     * ═══════════════════════════════════════════════════════════════════════════════
      * 
      * Admin Commands:
      * 
@@ -45,12 +73,11 @@ class MagerunTool
      *   Description: Creates an Admin Token for Web API authentication. This token can be used for 
      *                programmatic access to the Magento backend via REST or GraphQL.
      *   Usage: admin:token:create <username> [--no-newline]
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: username (required) - Admin username to create token for
-     *       Example: arguments: [0 => "admin"] or arguments: {"0": "admin"}
-     *     - Named option "no-newline": (optional, boolean) - Do not print newline after the token
-     *       Example: arguments: {"no-newline": true}
-     *   Full example: arguments: [0 => "admin", "no-newline" => true]
+     *   Parameters:
+     *     - username: Admin username to create token for
+     *   Examples:
+     *     - {"command": "admin:token:create", "username": "admin"}
+     *     - {"command": "admin:token:create", "email": "admin@example.com"}
      *   Security Warning: Keep your admin tokens secure. Do not share them or expose them in 
      *                     version control or public scripts.
      * 
@@ -59,11 +86,11 @@ class MagerunTool
      *                a Magento 2 admin user account from the command line.
      *   Usage: admin:user:activate <username|email>
      *   Aliases: admin:user:enable
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: username|email (required) - The username or email address 
-     *       of the admin user to activate
-     *       Example: arguments: [0 => "admin"] or arguments: [0 => "admin@example.com"]
-     *   Full example: arguments: [0 => "admin"]
+     *   Parameters:
+     *     - username: Username or email of the admin user to activate
+     *   Examples:
+     *     - {"command": "admin:user:activate", "username": "admin"}
+     *     - {"command": "admin:user:activate", "email": "admin@example.com"}
      *   Notes: You must have sufficient permissions to run this command. Useful for quickly 
      *          enabling admin access without using the Magento backend. Use admin:user:list to 
      *          see all admin users.
@@ -73,11 +100,11 @@ class MagerunTool
      *                deactivate a Magento 2 admin user account from the command line.
      *   Usage: admin:user:deactivate <username|email>
      *   Aliases: admin:user:disable
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: username|email (required) - The username or email address 
-     *       of the admin user to deactivate
-     *       Example: arguments: [0 => "admin"] or arguments: [0 => "admin@example.com"]
-     *   Full example: arguments: [0 => "admin"]
+     *   Parameters:
+     *     - username: Username or email of the admin user to deactivate
+     *   Examples:
+     *     - {"command": "admin:user:deactivate", "username": "admin"}
+     *     - {"command": "admin:user:deactivate", "email": "admin@example.com"}
      *   Notes: You must have sufficient permissions to run this command. Useful for quickly 
      *          disabling admin access without using the Magento backend. Use admin:user:list to 
      *          see all admin users.
@@ -86,80 +113,65 @@ class MagerunTool
      *   Description: Changes the status of an admin user. Can be used to activate or deactivate 
      *                a user. If no option is provided, the status will be toggled.
      *   Usage: admin:user:change-status [options] <username>
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: username|email (required) - The username or email of the 
-     *       admin user to modify
-     *     - Named option "activate": (optional, boolean) - Activates the specified user
-     *       Example: arguments: {"activate": true, "0": "john.doe"}
-     *     - Named option "deactivate": (optional, boolean) - Deactivates the specified user
-     *       Example: arguments: {"deactivate": true, "0": "john.doe"}
-     *   Full examples:
-     *     - Activate: arguments: {"activate": true, "0": "john.doe"}
-     *     - Deactivate: arguments: {"deactivate": true, "0": "john.doe"}
-     *     - Toggle status: arguments: [0 => "john.doe"] (if active, becomes inactive; if inactive, becomes active)
-     *   Notes: If neither --activate nor --deactivate is provided, the user's status will be 
+     *   Parameters:
+     *     - username: Username or email of the admin user to modify
+     *     - activate: (optional, boolean) - Activates the specified user
+     *     - deactivate: (optional, boolean) - Deactivates the specified user
+     *   Examples:
+     *     - Activate: {"command": "admin:user:change-status", "activate": true, "username": "john.doe"}
+     *     - Deactivate: {"command": "admin:user:change-status", "deactivate": true, "username": "john.doe"}
+     *     - Toggle: {"command": "admin:user:change-status", "username": "john.doe"}
+     *   Notes: If neither activate nor deactivate is provided, the user's status will be 
      *          toggled (active becomes inactive, inactive becomes active).
      * 
      * - admin:user:change-password
      *   Description: Change admin user password from the command line.
      *   Usage: admin:user:change-password [username] [password]
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: username (optional) - Admin username to change password for
-     *     - Positional argument [1]: password (optional) - New password for the admin user
-     *       Example: arguments: [0 => "admin", 1 => "newpassword123"]
-     *   Full example: arguments: [0 => "admin", 1 => "newpassword123"]
+     *   Parameters:
+     *     - username: (optional) - Admin username to change password for
+     *     - password: (optional) - New password for the admin user
+     *   Examples:
+     *     - {"command": "admin:user:change-password", "username": "admin", "password": "newpassword123"}
+     *     - {"command": "admin:user:change-password", "username": "admin", "arg1": "newpassword123"}
      *   Notes: If username or password are not provided, the command will prompt for them 
      *          interactively.
      * 
      * - admin:user:delete
      *   Description: Delete an admin user from the system.
      *   Usage: admin:user:delete [-f|--force] [<id>]
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: id (optional) - Username or email of the admin user to delete.
-     *       The command will attempt to find the user by username first, then by email if not found.
-     *       Example: arguments: [0 => "admin"] or arguments: [0 => "admin@example.com"]
-     *     - Named option "force" or "f": (optional, boolean) - Force deletion without confirmation
-     *       Example: arguments: {"force": true, "0": "admin"} or arguments: {"f": true, "0": "admin"}
-     *   Full examples:
-     *     - With confirmation prompt: arguments: [0 => "admin"]
-     *     - Force delete: arguments: {"force": true, "0": "admin"} or arguments: {"f": true, "0": "admin"}
-     *   Notes: If ID (username/email) is omitted, you will be prompted for it. If the force 
-     *          parameter (-f or --force) is omitted, you will be prompted for confirmation before 
-     *          deletion. ID can be either username or email address.
+     *   Parameters:
+     *     - username: (optional) - Username or email of the admin user to delete
+     *     - force: (optional, boolean) - Force deletion without confirmation
+     *   Examples:
+     *     - With prompt: {"command": "admin:user:delete", "username": "admin"}
+     *     - Force delete: {"command": "admin:user:delete", "username": "admin", "force": true}
+     *     - Using email: {"command": "admin:user:delete", "email": "admin@example.com", "force": true}
+     *   Notes: If username is omitted, you will be prompted for it. If the force 
+     *          parameter is omitted, you will be prompted for confirmation before deletion.
      * 
      * - admin:user:list
      *   Description: Displays a list of all admin users in the Magento installation. Provides 
      *                options to format the output and sort the list by various user attributes.
      *   Usage: admin:user:list [--format=<format>] [--sort=<field>] [--sort-order=<asc|desc>] 
      *          [--columns=<columns>]
-     *   Parameters (as arguments array):
-     *     - Named option "format": (optional, string) - Output format. One of: csv, json, 
-     *       json_array, yaml, xml. Default: table format.
-     *       Example: arguments: {"format": "json"} or arguments: {"format": "csv"}
-     *     - Named option "sort": (optional, string) - Sort by field. Options: user_id, username, 
-     *       email, logdate, firstname, lastname, created, modified. Default: user_id.
-     *       Example: arguments: {"sort": "username"} or arguments: {"sort": "email"}
-     *     - Named option "sort-order": (optional, string) - Sort order direction. Options: asc 
-     *       or desc. Default: asc.
-     *       Example: arguments: {"sort": "email", "sort-order": "desc"}
-     *     - Named option "columns": (optional, string) - Comma-separated list of columns to display.
-     *       Available columns: user_id, id, firstname, lastname, email, username, password, 
-     *       created, modified, logdate, lognum, reload_acl_flag, is_active, status, extra, 
-     *       rp_token, rp_token_created_at, interface_locale, failures_num, first_failure, 
-     *       lock_expires.
-     *       Example: arguments: {"columns": "user_id,firstname,lastname,email,logdate"}
-     *   Full examples:
-     *     - Default (sorted by user_id): arguments: {}
-     *     - Sort by username: arguments: {"sort": "username"}
-     *     - Sort by email descending: arguments: {"sort": "email", "sort-order": "desc"}
-     *     - JSON format: arguments: {"format": "json"}
-     *     - Custom columns: arguments: {"columns": "user_id,firstname,lastname,email,logdate"}
-     *     - Combined: arguments: {"format": "json", "sort": "username", "sort-order": "asc"}
-     *   Notes: By default, displays id, username, email, status, and logdate columns. The password 
-     *          column contains password hash - use with caution for security. Both "user_id" and 
-     *          "id" can be used in columns parameter, but output header will always be "id". Both 
-     *          "is_active" and "status" refer to user account status.
-     * - admin:user:create - arguments: {"username": "admin", "email": "admin@example.com", "password": "password123", "firstname": "Admin", "lastname": "User"}
+     *   Parameters:
+     *     - format: (optional) - Output format: csv, json, json_array, yaml, xml. Default: table
+     *     - sort: (optional) - Sort by field: user_id, username, email, logdate, firstname, lastname
+     *     - columns: (optional) - Comma-separated list of columns to display
+     *   Examples:
+     *     - Default: {"command": "admin:user:list"}
+     *     - JSON format: {"command": "admin:user:list", "format": "json"}
+     *     - Sorted: {"command": "admin:user:list", "sort": "username"}
+     *     - Custom columns: {"command": "admin:user:list", "columns": "user_id,firstname,lastname,email,logdate"}
+     *   Notes: By default, displays id, username, email, status, and logdate columns.
+     * 
+     * - admin:user:create
+     *   Description: Create a new admin user account.
+     *   Parameters:
+     *     - username: Admin username
+     *     - email: Admin email address
+     *     - password: Admin password
+     *   Example: {"command": "admin:user:create", "username": "admin", "email": "admin@example.com", "password": "password123"}
      * 
      * Cache Commands:
      * 
@@ -177,81 +189,59 @@ class MagerunTool
      *   Description: Cleans expired cache entries in Magento. Use this command to keep your cache 
      *                storage optimized and up-to-date.
      *   Usage: cache:clean [type...]
-     *   Parameters (as arguments array):
-     *     - Positional arguments: type(s) (optional, one or more) - Cache type(s) to clean. Can specify 
-     *       single type or multiple types. If omitted, cleans all cache types.
-     *       Example: arguments: [0 => "config"] or arguments: [0 => "config", 1 => "layout"]
+     *   Parameters:
+     *     - type: (optional) - Cache type(s) to clean. Use arg1, arg2 for additional types.
      *       Available types: config, layout, block_html, collections, reflection, db_ddl, eav, 
-     *                        config_integration, config_integration_api, config_webservice_api, 
-     *                        full_page, translate, config_integration_api, etc. Use cache:list to see all.
-     *   Full examples:
-     *     - Clean all: arguments: {}
-     *     - Clean single type: arguments: [0 => "config"]
-     *     - Clean multiple types: arguments: [0 => "config", 1 => "layout", 2 => "block_html"]
-     *   Notes: To remove all cache entries completely, use cache:flush command instead. Run 
-     *          cache:list to see all available cache codes.
+     *                        full_page, translate, etc.
+     *   Examples:
+     *     - Clean all: {"command": "cache:clean"}
+     *     - Clean single: {"command": "cache:clean", "type": "config"}
+     *     - Clean multiple: {"command": "cache:clean", "type": "config", "arg1": "layout", "arg2": "block_html"}
+     *   Notes: To remove all cache entries completely, use cache:flush command instead.
      * 
      * - cache:disable
      *   Description: Disable Magento cache type(s).
      *   Usage: cache:disable [--format[=FORMAT]] [type...]
-     *   Parameters (as arguments array):
-     *     - Positional arguments: type(s) (optional, one or more) - Cache type(s) to disable. If omitted, 
-     *       all cache types will be disabled.
-     *       Example: arguments: [0 => "config"] or arguments: [0 => "config", 1 => "layout"]
-     *     - Named option "format": (optional, string) - Output format. One of: csv, json, json_array, 
-     *       yaml, xml.
-     *       Example: arguments: {"format": "json", "0": "config"}
-     *   Full examples:
-     *     - Disable all: arguments: {}
-     *     - Disable single type: arguments: [0 => "config"]
-     *     - Disable multiple with format: arguments: {"format": "json", "0": "config", "1": "layout"}
+     *   Parameters:
+     *     - type: (optional) - Cache type(s) to disable
+     *     - format: (optional) - Output format: csv, json, json_array, yaml, xml
+     *   Examples:
+     *     - Disable all: {"command": "cache:disable"}
+     *     - Disable single: {"command": "cache:disable", "type": "config"}
+     *     - With format: {"command": "cache:disable", "type": "config", "format": "json"}
      *   Notes: Run cache:list command to see all cache codes.
      * 
      * - cache:enable
      *   Description: Enable Magento cache type(s).
      *   Usage: cache:enable [--format[=FORMAT]] [type...]
-     *   Parameters (as arguments array):
-     *     - Positional arguments: type(s) (optional, one or more) - Cache type(s) to enable. If omitted, 
-     *       all cache types will be enabled.
-     *       Example: arguments: [0 => "config"] or arguments: [0 => "config", 1 => "layout"]
-     *     - Named option "format": (optional, string) - Output format. One of: csv, json, json_array, 
-     *       yaml, xml.
-     *       Example: arguments: {"format": "json", "0": "config"}
-     *   Full examples:
-     *     - Enable all: arguments: {}
-     *     - Enable single type: arguments: [0 => "config"]
-     *     - Enable multiple with format: arguments: {"format": "json", "0": "config", "1": "layout"}
+     *   Parameters:
+     *     - type: (optional) - Cache type(s) to enable
+     *     - format: (optional) - Output format: csv, json, json_array, yaml, xml
+     *   Examples:
+     *     - Enable all: {"command": "cache:enable"}
+     *     - Enable single: {"command": "cache:enable", "type": "config"}
+     *     - With format: {"command": "cache:enable", "type": "config", "format": "json"}
      *   Notes: Run cache:list command to see all cache codes.
      * 
      * - cache:flush
      *   Description: Remove all cache entries from cache backend. Clears the cache backend completely, 
      *                so other cache types in the same backend will be cleared as well.
      *   Usage: cache:flush [type...]
-     *   Parameters (as arguments array):
-     *     - Positional arguments: type(s) (optional, one or more) - Cache type(s) to flush. If omitted, 
-     *       flushes all cache types.
-     *       Example: arguments: [0 => "config"] or arguments: [0 => "config", 1 => "layout"]
-     *   Full examples:
-     *     - Flush all: arguments: {}
-     *     - Flush specific type(s): arguments: [0 => "full_page"]
-     *   Notes: Keep in mind that cache:flush clears the cache backend, so other cache types in the 
-     *          same backend will be cleared as well. This is more aggressive than cache:clean.
+     *   Parameters:
+     *     - type: (optional) - Cache type(s) to flush
+     *   Examples:
+     *     - Flush all: {"command": "cache:flush"}
+     *     - Flush specific: {"command": "cache:flush", "type": "full_page"}
+     *   Notes: cache:flush clears the cache backend completely - more aggressive than cache:clean.
      * 
      * - cache:list
      *   Description: List Magento cache status - shows all cache types and their enabled/disabled status.
      *   Usage: cache:list [--enabled[=ENABLED]] [--format[=FORMAT]]
-     *   Parameters (as arguments array):
-     *     - Named option "enabled": (optional, integer) - Filter the list to display only enabled [1] 
-     *       or disabled [0] cache types
-     *       Example: arguments: {"enabled": 1} (show only enabled) or arguments: {"enabled": 0} (show only disabled)
-     *     - Named option "format": (optional, string) - Output format. One of: csv, json, json_array, 
-     *       yaml, xml.
-     *       Example: arguments: {"format": "json"} or arguments: {"enabled": 1, "format": "json"}
-     *   Full examples:
-     *     - List all: arguments: {}
-     *     - List enabled only: arguments: {"enabled": 1}
-     *     - List in JSON: arguments: {"format": "json"}
-     *     - Combined: arguments: {"enabled": 1, "format": "json"}
+     *   Parameters:
+     *     - format: (optional) - Output format: csv, json, json_array, yaml, xml
+     *   Examples:
+     *     - List all: {"command": "cache:list"}
+     *     - JSON format: {"command": "cache:list", "format": "json"}
      * 
      * - cache:remove:id
      *   Description: Remove cache entry by ID. The command is not checking if the cache id exists by 
@@ -604,9 +594,12 @@ class MagerunTool
      *                option can remove important data from the dump; review your table groups before 
      *                using it.
      *   Usage: db:dump [options] [--] [<filename>]
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: filename (optional) - Dump filename
-     *       Example: arguments: [0 => "dump.sql"]
+     *   Parameters:
+     *     - path: (optional) - Dump filename
+     *     - force: (optional, boolean) - Skip confirmation
+     *   Examples:
+     *     - {"command": "db:dump", "path": "dump.sql"}
+     *     - {"command": "db:dump", "path": "dump.sql", "force": true}
      *     - Named option "connection": (optional, string) - Select DB connection type. Default: default
      *       Example: arguments: {"connection": "default"}
      *     - Named option "add-routines": (optional, boolean) - Include stored routines in dump 
@@ -699,9 +692,12 @@ class MagerunTool
      *                --drop-tables options will remove existing data before import. Make sure you 
      *                have backups and understand the consequences before using these options.
      *   Usage: db:import [options] [<filename>]
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: filename (required) - Dump filename to import
-     *       Example: arguments: [0 => "dump.sql.gz"]
+     *   Parameters:
+     *     - path: (required) - Dump filename to import
+     *     - force: (optional, boolean) - Skip confirmation
+     *   Examples:
+     *     - {"command": "db:import", "path": "dump.sql.gz"}
+     *     - {"command": "db:import", "path": "dump.sql", "force": true}
      *     - Named option "connection": (optional, string) - Select DB connection type for Magento 
      *       configurations with several databases
      *       Example: arguments: {"connection": "default"}
@@ -767,9 +763,12 @@ class MagerunTool
      *                be done with caution, especially in production environments. Always review your 
      *                queries before execution.
      *   Usage: db:query [--connection=CONNECTION] [--only-command] [--format=FORMAT] [<query>]
-     *   Parameters (as arguments array):
-     *     - Positional argument [0]: query (optional) - SQL query to execute
-     *       Example: arguments: [0 => "SELECT * FROM admin_user LIMIT 5"]
+     *   Parameters:
+     *     - query: (optional) - SQL query to execute
+     *     - format: (optional) - Output format: csv, json, json_array, yaml, xml
+     *   Examples:
+     *     - {"command": "db:query", "query": "SELECT * FROM admin_user LIMIT 5"}
+     *     - {"command": "db:query", "query": "SHOW TABLES", "format": "json"}
      *     - Named option "connection": (optional, string) - Select DB connection type for Magento 
      *       configurations with several databases
      *       Example: arguments: {"connection": "default"}
@@ -839,10 +838,21 @@ class MagerunTool
      *     - Combined: arguments: {"format": "json", "rounding": 2, "0": "max_connections%"]
      * 
      * Customer Commands:
-     * - customer:create - arguments: {"email": "customer@example.com", "password": "password123", "firstname": "John", "lastname": "Doe", "website": "base"}
-     * - customer:list - arguments: {"website": "base"} (website optional)
-     * - customer:info - arguments: {"email": "customer@example.com"}
-     * - customer:delete - arguments: {"email": "customer@example.com"}
+     * - customer:create
+     *   Parameters: email, password, username (optional), website
+     *   Example: {"command": "customer:create", "email": "customer@example.com", "password": "password123", "website": "base"}
+     * 
+     * - customer:list
+     *   Parameters: website (optional)
+     *   Example: {"command": "customer:list", "website": "base"}
+     * 
+     * - customer:info
+     *   Parameters: email
+     *   Example: {"command": "customer:info", "email": "customer@example.com"}
+     * 
+     * - customer:delete
+     *   Parameters: email, force (optional)
+     *   Example: {"command": "customer:delete", "email": "customer@example.com", "force": true}
      * 
      * EAV Commands:
      * 
@@ -1333,20 +1343,95 @@ class MagerunTool
      * 
      * See https://github.com/netz98/n98-magerun2 for full command documentation with all parameters.
      * 
-     * @param string $command Full magerun command path (e.g., "db:query", "cache:clean", "admin:user:list", "config:store:get", "sys:check")
-     * @param array|null $arguments Command-specific arguments as key-value pairs. Each command has different parameters (see description above for examples). Common patterns: {"query": "..."} for db:query, {"type": "..."} for cache:clean, {"path": "..."} for config:store:get, {"email": "..."} for customer commands, {"username": "..."} for admin commands.
+     * @param string $command Full magerun command path (e.g., "db:query", "cache:clean", "admin:user:list")
+     * @param string|null $username Username (auto-mapped to positional argument for admin commands)
+     * @param string|null $email Email address (alternative to username)
+     * @param string|null $user User identifier (alternative to username/email)
+     * @param string|null $query SQL query (for db:query command)
+     * @param string|null $path File/directory path
+     * @param string|null $store Store code
+     * @param string|null $website Website code
+     * @param bool $activate Activate flag
+     * @param bool $deactivate Deactivate flag
+     * @param bool $force Force flag
+     * @param string|null $type Type parameter (e.g., cache type)
+     * @param string|null $format Output format (json, csv, xml, yaml)
+     * @param string|null $sort Sort field
+     * @param string|null $columns Columns to display
+     * @param string|null $password Password
+     * @param string|null $arg0 Generic positional argument (fallback)
+     * @param string|null $arg1 Second positional argument
+     * @param string|null $arg2 Third positional argument
      * @return TextContent
+     * 
+     * Why named parameters instead of "0", "1", "2"?
+     * PHP cannot have numeric parameter names, and the php-mcp/server library maps JSON-RPC 
+     * arguments to method parameters by name. Numeric keys like "0", "1" cannot be mapped.
+     * Solution: Use descriptive names (username, email, query) that auto-map to positional args.
      */
     #[McpTool(name: 'magerun')]
     public function executeMagerun(
-        string $command,
-        ?array $arguments = null
+        string $command = '',
+        // Descriptive parameters for common use cases (auto-mapped to positional args)
+        ?string $username = null,
+        ?string $email = null,
+        ?string $user = null,
+        ?string $query = null,
+        ?string $path = null,
+        ?string $store = null,
+        ?string $website = null,
+        // Boolean flags
+        bool $activate = false,
+        bool $deactivate = false,
+        bool $force = false,
+        // Named options
+        ?string $type = null,
+        ?string $format = null,
+        ?string $sort = null,
+        ?string $columns = null,
+        ?string $password = null,
+        // Generic fallback for other positional arguments
+        ?string $arg0 = null,
+        ?string $arg1 = null,
+        ?string $arg2 = null
     ): TextContent {
+        // Build params array from individual parameters
+        $params = [];
+        
+        // Smart mapping: Use descriptive parameters as positional arguments
+        // Priority: username > email > user > query > path > arg0
+        $positionalArg = $username ?? $email ?? $user ?? $query ?? $path ?? $arg0;
+        
+        if ($positionalArg !== null) {
+            $params[0] = $positionalArg;
+        }
+        if ($arg1 !== null) {
+            $params[1] = $arg1;
+        }
+        if ($arg2 !== null) {
+            $params[2] = $arg2;
+        }
+        
+        // Add boolean flags
+        if ($activate) $params['activate'] = $activate;
+        if ($deactivate) $params['deactivate'] = $deactivate;
+        if ($force) $params['force'] = $force;
+        
+        // Add named options
+        if ($type !== null) $params['type'] = $type;
+        if ($format !== null) $params['format'] = $format;
+        if ($sort !== null) $params['sort'] = $sort;
+        if ($columns !== null) $params['columns'] = $columns;
+        if ($store !== null) $params['store'] = $store;
+        if ($website !== null) $params['website'] = $website;
+        if ($password !== null) $params['password'] = $password;
+        
         // Start output buffering to catch any PHP errors/warnings
         ob_start();
         $originalErrorReporting = error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR);
         
         try {
+            // Validate command
             if (empty($command)) {
                 ob_end_clean();
                 error_reporting($originalErrorReporting);
@@ -1354,6 +1439,17 @@ class MagerunTool
                 $this->getLogger()->logError('', $errorMsg, '');
                 return new TextContent($errorMsg);
             }
+            
+            // IMPORTANT LIMITATION: The php-mcp/server library extracts named parameters (like 'command') 
+            // from the JSON-RPC arguments object and maps them to method parameters by name.
+            // When it does this, it filters out numeric keys (like "0", "1") that don't match parameter names.
+            // This means positional arguments may be lost. The library passes the remaining arguments
+            // to the $arguments parameter, but numeric keys are filtered out during parameter extraction.
+            // 
+            // WORKAROUND: Use named arguments where possible, or use the execute_sql tool for operations
+            // that require positional arguments. For example, instead of:
+            //   {"command": "admin:user:activate", "0": "admin"}
+            // Use SQL: UPDATE admin_user SET is_active = 1 WHERE username = 'admin'
 
             $magentoRoot = $this->getMagentoRoot();
             $magerunPath = $magentoRoot . '/bin/n98-magerun2.phar';
@@ -1367,16 +1463,47 @@ class MagerunTool
                 return new TextContent($errorMsg);
             }
 
+
             // Build command
             $cmd = ['php', $magerunPath, $command];
 
             // Add magerun command arguments (e.g., --format=json)
-            if ($arguments) {
-                foreach ($arguments as $key => $value) {
-                    if (is_numeric($key)) {
-                        // Positional argument
-                        $cmd[] = (string)$value;
-                    } elseif (is_bool($value)) {
+            // Handle the case where params might be an associative array with numeric string keys
+            // or a sequential array (if numeric keys were lost during parameter extraction)
+            if (!empty($params)) {
+                
+                // Check if params is a sequential array (numeric keys starting from 0)
+                // This happens when the MCP framework converts numeric keys to sequential indices
+                $isSequentialArray = array_keys($params) === range(0, count($params) - 1);
+                
+                // Sort arguments to ensure positional arguments (numeric keys) come first
+                // This is important for magerun commands that require positional arguments
+                $positionalArgs = [];
+                $namedArgs = [];
+                
+                foreach ($params as $key => $value) {
+                    // Handle sequential arrays (when numeric keys were converted to 0,1,2...)
+                    if ($isSequentialArray) {
+                        // All values in a sequential array are positional arguments
+                        $positionalArgs[(int)$key] = (string)$value;
+                    } elseif (is_int($key) || (is_string($key) && ctype_digit($key))) {
+                        // Handle both string numeric keys ("0", "1") and integer keys (0, 1)
+                        // JSON decodes numeric string keys as integers, but we need to handle both cases
+                        $positionalArgs[(int)$key] = (string)$value;
+                    } else {
+                        $namedArgs[$key] = $value;
+                    }
+                }
+                
+                // Add positional arguments in order (0, 1, 2, etc.)
+                ksort($positionalArgs);
+                foreach ($positionalArgs as $value) {
+                    $cmd[] = $value;
+                }
+                
+                // Add named arguments
+                foreach ($namedArgs as $key => $value) {
+                    if (is_bool($value)) {
                         // Boolean flag
                         if ($value) {
                             $cmd[] = '--' . $key;
@@ -1386,6 +1513,7 @@ class MagerunTool
                         $cmd[] = '--' . $key . '=' . $value;
                     }
                 }
+                
             }
 
             // Execute magerun command

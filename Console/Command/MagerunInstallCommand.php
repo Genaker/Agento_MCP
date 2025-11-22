@@ -99,3 +99,5 @@ class MagerunInstallCommand extends Command
 
 
 
+
+
