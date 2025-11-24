@@ -19,7 +19,7 @@ if (!function_exists('getMagentoRoot')) {
         
         // Fallback: go up from tests until we find bin/magento
         $current = $testDir;
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 5; $i++) {
             $current = dirname($current);
             if (file_exists($current . '/bin/magento')) {
                 return $current;

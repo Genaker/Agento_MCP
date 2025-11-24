@@ -51,74 +51,8 @@ class Logger
             return $this->magentoRoot;
         }
         
-        // Try to discover Magento root from current file location
-        $currentDir = __DIR__;
-        
-        // Try app/code path
-        $appCodePath = dirname(dirname(dirname(dirname(dirname($currentDir)))));
-        if ($this->isMagentoRoot($appCodePath)) {
-            $this->magentoRoot = $appCodePath;
-            return $appCodePath;
-        }
-        
-        // Try vendor path
-        if (strpos($currentDir, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) !== false) {
-            $pathParts = explode(DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR, $currentDir);
-            if (count($pathParts) >= 2) {
-                $vendorPath = dirname($pathParts[0] . DIRECTORY_SEPARATOR . 'vendor');
-                if ($this->isMagentoRoot($vendorPath)) {
-                    $this->magentoRoot = $vendorPath;
-                    return $vendorPath;
-                }
-            }
-        }
-        
-        // Search upwards
-        $current = $currentDir;
-        for ($i = 0; $i < 15; $i++) {
-            if ($this->isMagentoRoot($current)) {
-                $this->magentoRoot = $current;
-                return $current;
-            }
-            
-            $parent = dirname($current);
-            if ($parent === $current) {
-                break;
-            }
-            $current = $parent;
-        }
-        
-        // Fallback
-        $this->magentoRoot = $appCodePath;
-        return $appCodePath;
-    }
-    
-    /**
-     * Check if given path is a Magento root directory
-     *
-     * @param string $path
-     * @return bool
-     */
-    private function isMagentoRoot(string $path): bool
-    {
-        $markers = [
-            $path . '/bin/magento',
-            $path . '/app/etc/env.php',
-            $path . '/app/etc/di.xml',
-            $path . '/pub/index.php'
-        ];
-        
-        $foundCount = 0;
-        foreach ($markers as $marker) {
-            if (file_exists($marker)) {
-                $foundCount++;
-                if ($foundCount >= 2) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
+        $this->magentoRoot = MagentoRootHelper::getMagentoRoot(__DIR__);
+        return $this->magentoRoot;
     }
     
     /**

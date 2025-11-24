@@ -12,6 +12,7 @@
 */
 
 uses(Tests\TestCase::class)->group('agento')->in('Feature');
+uses(Tests\TestCase::class)->group('agento')->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
